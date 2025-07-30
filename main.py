@@ -12,35 +12,20 @@ import torch.nn.functional as F
 class ConvNeuralNetwork(nn.Module):
     def __init__(self):
         super(ConvNeuralNetwork, self).__init__()
-        self.classifier = nn.Sequential(
-            nn.Conv2d(1, 28, kernel_size=3, padding='same'),
+        self.conv = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3),  # output: (32, 26, 26)
             nn.ReLU(),
-
-            nn.Conv2d(28, 28, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.MaxPool2d(2),
-            nn.Dropout(0.25),
-
-            nn.Conv2d(28, 56, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.Conv2d(56, 56, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.MaxPool2d(2),
-            nn.Dropout(0.25)
+            nn.MaxPool2d(2)                   # output: (32, 13, 13)
         )
         self.flatten = nn.Flatten()
         self.fc = nn.Sequential(
-            nn.Linear(56 * 7 * 7, 128),
+            nn.Linear(32 * 13 * 13, 128),     # 32*13*13 = 5408
             nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 10)  # y는 10
+            nn.Linear(128, 10)                # Final output layer
         )
 
     def forward(self, x):
-        x = self.classifier(x)
+        x = self.conv(x)
         x = self.flatten(x)
         x = self.fc(x)
         return x

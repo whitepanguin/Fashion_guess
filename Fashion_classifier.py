@@ -48,11 +48,11 @@ def prepare_imagefolder(train_csv, test_csv, train_output, test_output):
     else:
         print("✅ test 이미지 폴더 이미 존재함, 변환 생략")
 
-train_csv  = '/content/drive/MyDrive/AI활용 소프트웨어 개발/12_딥러닝/data/fashion-mnist_train.csv'
-test_csv  = '/content/drive/MyDrive/AI활용 소프트웨어 개발/12_딥러닝/data/fashion-mnist_test.csv'
+train_csv  = 'fashion-mnist_train.csv'
+test_csv  = 'fashion-mnist_test.csv'
 
-train_output = '/content/drive/MyDrive/AI활용 소프트웨어 개발/12_딥러닝/data/train'
-test_output = '/content/drive/MyDrive/AI활용 소프트웨어 개발/12_딥러닝/data/test'
+train_output = 'train'
+test_output = 'test'
 prepare_imagefolder(train_csv, test_csv, train_output, test_output)
 
 transform = transforms.Compose([
@@ -138,35 +138,20 @@ print(device)
 class ConvNeuralNetwork(nn.Module):
     def __init__(self):
         super(ConvNeuralNetwork, self).__init__()
-        self.classifier = nn.Sequential(
-            nn.Conv2d(1, 28, kernel_size=3, padding='same'),
+        self.conv = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3),  # output: (32, 26, 26)
             nn.ReLU(),
-
-            nn.Conv2d(28, 28, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.MaxPool2d(2),
-            nn.Dropout(0.25),
-
-            nn.Conv2d(28, 56, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.Conv2d(56, 56, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.MaxPool2d(2),
-            nn.Dropout(0.25)
+            nn.MaxPool2d(2)                   # output: (32, 13, 13)
         )
         self.flatten = nn.Flatten()
         self.fc = nn.Sequential(
-            nn.Linear(56 * 7 * 7, 128),
+            nn.Linear(32 * 13 * 13, 128),     # 32*13*13 = 5408
             nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 10)  # y는 10
+            nn.Linear(128, 10)                # Final output layer
         )
 
     def forward(self, x):
-        x = self.classifier(x)
+        x = self.conv(x)
         x = self.flatten(x)
         x = self.fc(x)
         return x
@@ -201,7 +186,7 @@ def train_loop(train_loader, model, loss_fn, optimizer):
     avg_acc = sum_accs / len(train_loader)
     return avg_loss, avg_acc
 
-epochs = 50
+epochs = 20
 
 for i in range(epochs):
     print(f"------------------------------------------------")
@@ -224,45 +209,6 @@ for ax, img, label in zip(axes.flatten(), imgs, labels):
     ax.set_title(class_map[label.item()])
     ax.axis('off')
 
-def test(model, loader):
-    model.eval()
-
-    sum_accs = 0
-
-    img_list = torch.Tensor().to(device)
-    y_pred_list = torch.Tensor().to(device)
-    y_true_list = torch.Tensor().to(device)
-
-    for x_batch, y_batch in loader:
-        x_batch = x_batch.to(device)
-        y_batch = y_batch.to(device)
-        y_pred = model(x_batch)
-        y_prob = nn.Softmax(1)(y_pred)
-        y_pred_index = torch.argmax(y_prob, axis=1)
-        y_pred_list = torch.cat((y_pred_list, y_pred_index), dim=0) # 예측한 리스트 행으로 붙음
-        y_true_list = torch.cat((y_true_list, y_batch), dim=0)
-        img_list = torch.cat((img_list, x_batch), dim=0)
-        acc = (y_batch == y_pred_index).float().sum() / len(y_batch) * 100
-        sum_accs += acc
-
-    avg_acc = sum_accs / len(loader)
-    return y_pred_list, y_true_list, img_list, avg_acc
-
-y_pred_list, y_true_list, img_list, avg_acc = test(model, test_loader)
-print(f'테스트 정확도는 {avg_acc:.2f}% 입니다.')
-
-fig, axes = plt.subplots(4, 8, figsize=(16, 8))
-
-img_list_cpu = img_list.cpu()
-y_pred_list_cpu = y_pred_list.cpu()
-y_true_list_cpu = y_true_list.cpu()
-
-for ax, img, y_pred, y_true in zip(axes.flatten(), img_list_cpu, y_pred_list_cpu, y_true_list_cpu):
-  ax.imshow(img.reshape(28, 28), cmap='gray')
-  ax.set_title(f'pred: {class_map[y_pred.item()]}, true: {class_map[y_true.item()]}')
-  ax.axis('off')
-
-plt.show()
 
 # 모델의 가중치와 매개변수만 저장
 # 모델의 구조가 저장되지 않으므로 모델 클래스 정의가 없으면 복원할 수 없음
