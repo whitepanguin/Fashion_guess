@@ -1,92 +1,100 @@
+<img width="1915" height="1001" alt="12" src="https://github.com/user-attachments/assets/2076357b-56b5-45c8-ad2a-53cd4e672d60" />
+
+<img width="1053" height="246" alt="21" src="https://github.com/user-attachments/assets/f4532fb0-e932-4832-aff8-88fc675250c1" />
+
 1차 시도
-class ConvNeuralNetwork(nn.Module):
-def **init**(self):
-super(ConvNeuralNetwork, self).**init**()
-self.classifier = nn.Sequential(
-nn.Conv2d(1, 28, kernel_size=3, padding='same'),
-nn.ReLU(),
 
-            nn.Conv2d(28, 28, kernel_size=3, padding='same'),
+            class ConvNeuralNetwork(nn.Module):
+            def **init**(self):
+            super(ConvNeuralNetwork, self).**init**()
+            self.classifier = nn.Sequential(
+            nn.Conv2d(1, 28, kernel_size=3, padding='same'),
             nn.ReLU(),
-
-            nn.MaxPool2d(2),
-            nn.Dropout(0.25),
-
-            nn.Conv2d(28, 56, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.Conv2d(56, 56, kernel_size=3, padding='same'),
-            nn.ReLU(),
-
-            nn.MaxPool2d(2),
-            nn.Dropout(0.25)
-        )
-        self.flatten = nn.Flatten()
-        self.fc = nn.Sequential(
-            nn.Linear(56 * 7 * 7, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 10)  # y는 10
-        )
-
-    def forward(self, x):
-        x = self.classifier(x)
-        x = self.flatten(x)
-        x = self.fc(x)
-        return x
+            
+                        nn.Conv2d(28, 28, kernel_size=3, padding='same'),
+                        nn.ReLU(),
+            
+                        nn.MaxPool2d(2),
+                        nn.Dropout(0.25),
+            
+                        nn.Conv2d(28, 56, kernel_size=3, padding='same'),
+                        nn.ReLU(),
+            
+                        nn.Conv2d(56, 56, kernel_size=3, padding='same'),
+                        nn.ReLU(),
+            
+                        nn.MaxPool2d(2),
+                        nn.Dropout(0.25)
+                    )
+                    self.flatten = nn.Flatten()
+                    self.fc = nn.Sequential(
+                        nn.Linear(56 * 7 * 7, 128),
+                        nn.ReLU(),
+                        nn.Dropout(0.5),
+                        nn.Linear(128, 10)  # y는 10
+                    )
+            
+                def forward(self, x):
+                    x = self.classifier(x)
+                    x = self.flatten(x)
+                    x = self.fc(x)
+                    return x
 
 정확도 75%너무 성능이 안나오고 무겁다
 
 2차 시도
-class ConvNeuralNetwork(nn.Module):
-def **init**(self):
-super(ConvNeuralNetwork, self).**init**()
-self.conv_layers = nn.Sequential(
-nn.Conv2d(1, 64, kernel_size=3), # -> (64, 26, 26)
-nn.ReLU(),
-nn.MaxPool2d(2), # -> (64, 13, 13)
 
-            nn.Conv2d(64, 64, kernel_size=3),    # -> (64, 11, 11)
+            class ConvNeuralNetwork(nn.Module):
+            def **init**(self):
+            super(ConvNeuralNetwork, self).**init**()
+            self.conv_layers = nn.Sequential(
+            nn.Conv2d(1, 64, kernel_size=3), # -> (64, 26, 26)
             nn.ReLU(),
-            nn.MaxPool2d(2)                      # -> (64, 5, 5)
-        )
-        self.flatten = nn.Flatten()
-        self.fc_layers = nn.Sequential(
-            nn.Linear(64 * 5 * 5, 128),          # 64 filters * 5x5 feature maps
-            nn.ReLU(),
-            nn.Linear(128, 10)                   # Final classification layer
-        )
-
-    def forward(self, x):
-        x = self.conv_layers(x)
-        x = self.flatten(x)
-        x = self.fc_layers(x)
-        return x
+            nn.MaxPool2d(2), # -> (64, 13, 13)
+            
+                        nn.Conv2d(64, 64, kernel_size=3),    # -> (64, 11, 11)
+                        nn.ReLU(),
+                        nn.MaxPool2d(2)                      # -> (64, 5, 5)
+                    )
+                    self.flatten = nn.Flatten()
+                    self.fc_layers = nn.Sequential(
+                        nn.Linear(64 * 5 * 5, 128),          # 64 filters * 5x5 feature maps
+                        nn.ReLU(),
+                        nn.Linear(128, 10)                   # Final classification layer
+                    )
+            
+                def forward(self, x):
+                    x = self.conv_layers(x)
+                    x = self.flatten(x)
+                    x = self.fc_layers(x)
+                    return x
 
 정확도 85% 가볍고 성능도 나오지만 아직 뭔가 부족해 보인다
 
 -> https://airsbigdata.tistory.com/219 참고
 
-class ConvNeuralNetwork(nn.Module):
-def **init**(self):
-super(ConvNeuralNetwork, self).**init**()
-self.conv = nn.Sequential(
-nn.Conv2d(1, 32, kernel*size=3), # output: (32, 26, 26)
-nn.ReLU(),
-nn.MaxPool2d(2) # output: (32, 13, 13)
-)
-self.flatten = nn.Flatten()
-self.fc = nn.Sequential(
-nn.Linear(32 * 13 \_ 13, 128), # 32*13*13 = 5408
-nn.ReLU(),
-nn.Linear(128, 10) # Final output layer
-)
+3차 시도
 
-    def forward(self, x):
-        x = self.conv(x)
-        x = self.flatten(x)
-        x = self.fc(x)
-        return x
+            class ConvNeuralNetwork(nn.Module):
+            def **init**(self):
+            super(ConvNeuralNetwork, self).**init**()
+            self.conv = nn.Sequential(
+            nn.Conv2d(1, 32, kernel*size=3), # output: (32, 26, 26)
+            nn.ReLU(),
+            nn.MaxPool2d(2) # output: (32, 13, 13)
+            )
+            self.flatten = nn.Flatten()
+            self.fc = nn.Sequential(
+            nn.Linear(32 * 13 \_ 13, 128), # 32*13*13 = 5408
+            nn.ReLU(),
+            nn.Linear(128, 10) # Final output layer
+            )
+            
+                def forward(self, x):
+                    x = self.conv(x)
+                    x = self.flatten(x)
+                    x = self.fc(x)
+                    return x
 
 torch.Size([64, 1, 28, 28]) torch.Size([64])
 cpu
@@ -147,7 +155,5 @@ ConvNeuralNetwork(
 Epoch 19/20 Loss: 0.115697 Accuracy: 96.28%
 Done!
 
-<img width="1915" height="1001" alt="12" src="https://github.com/user-attachments/assets/2076357b-56b5-45c8-ad2a-53cd4e672d60" />
 
-<img width="1053" height="246" alt="21" src="https://github.com/user-attachments/assets/f4532fb0-e932-4832-aff8-88fc675250c1" />
 
