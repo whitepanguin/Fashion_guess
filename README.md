@@ -146,3 +146,8 @@ ConvNeuralNetwork(
 
 Epoch 19/20 Loss: 0.115697 Accuracy: 96.28%
 Done!
+
+<img width="1915" height="1001" alt="12" src="https://github.com/user-attachments/assets/2076357b-56b5-45c8-ad2a-53cd4e672d60" />
+
+<img width="1053" height="246" alt="21" src="https://github.com/user-attachments/assets/f4532fb0-e932-4832-aff8-88fc675250c1" />
+
