@@ -155,5 +155,6 @@ ConvNeuralNetwork(
 Epoch 19/20 Loss: 0.115697 Accuracy: 96.28%
 Done!
 
+결과적으로 96% 효율을 내는 패션 예측 모델을 만들수 있었다.
 
 
